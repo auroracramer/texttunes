@@ -1,19 +1,33 @@
 from flask import Flask, request, redirect
-import sys
-sys.path.append("/home/j/jt/jtcramer/.local/lib/python2.7/site-packages/")
+from path_fix import *
 import twilio.twiml
+import soundcloud
+from soundcloud_settings import *
+from soundcloud_interface import *
+
+
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+client = soundcloud.Client(client_id=client_id, \
+                           client_secret=client_secret, \
+                           username=username, \
+                           password=password)
+
+@app.route("/")
+def enter():
+    print twilio_number
+    return "TextTunes number: " + str(twilio_number)
+
+@app.route("/request", methods=["GET", "POST"])
 def receive_message():
     text = request.values.get("Body", None)
 
+    process_text(text, playlist_uri, client)
+
     resp = twilio.twiml.Response()
-    resp.message("You said: " + text)
+    resp.message("Thanks for contributing to the playlist! I've added the song '" + song.title + "'.")
 
     return str(resp)
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
