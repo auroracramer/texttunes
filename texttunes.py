@@ -14,7 +14,8 @@ client = soundcloud.Client(client_id=client_id, \
 
 @app.route("/")
 def enter():
-    return "TextTunes Number: " + str(twilio_number)
+    html = "<html><head><title>TextTunes</title></head><body>Text your music recommendations to: " + str(twilio_number) + "!<p><p>Listen to the playlist <a href=\"http://www.soundcloud.com/" + username + "/sets/" + playlist_name +  "\">here!</a></body></html>"
+    return html
 
 @app.route("/request", methods=["GET", "POST"])
 def receive_message():
