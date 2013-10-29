@@ -1,7 +1,6 @@
 from flask import Flask, request, redirect
 from path_fix import *
 import twilio.twiml
-import soundcloud
 from soundcloud_settings import *
 from soundcloud_interface import *
 
@@ -15,17 +14,21 @@ client = soundcloud.Client(client_id=client_id, \
 
 @app.route("/")
 def enter():
-    print twilio_number
-    return "TextTunes number: " + str(twilio_number)
+    return "TextTunes Number: " + str(twilio_number)
 
 @app.route("/request", methods=["GET", "POST"])
 def receive_message():
     text = request.values.get("Body", None)
-
-    process_text(text, playlist_uri, client)
-
     resp = twilio.twiml.Response()
-    resp.message("Thanks for contributing to the playlist! I've added the song '" + song.title + "'.")
+
+    try:
+        song = process_text(text, playlist_uri, client)
+        if song:
+            resp.message("Thanks for contributing to the playlist! I've added the song '" + song.title + "'.")
+        else:
+            resp.message("No songs could be found that match query. :(")
+    except Exception as e:
+        resp.message(str(e))
 
     return str(resp)
 
